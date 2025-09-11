@@ -46,4 +46,29 @@ router.post("/register",async(req,res)=>{
 })
 
 
+
+router.post("/login",async(req , res)=>{
+    const data=req.body;
+    const dataInDb=await prisma.user.findFirst({where:{username:data.username,userType:data.userType}})
+    if(dataInDb){
+        if(dataInDb.password==hashPassword(data.password)){
+            delete dataInDb.password;
+            const token=jwtToken(dataInDb);
+            return res.status(200).send({token:token})
+        }
+
+        else{
+            return res.status(409).json({message:"unautrorized!!!"})
+        }
+    }
+
+    else{
+        return res.status(404).json({message:"not registered"})
+    }
+
+})
+
+
+
+
 module.exports=router;
