@@ -16,6 +16,9 @@ app.use(authRouter);
 
 app.use(verifyUserToken);
 
+const taskRouter=require("./controllers/task");
+app.use(taskRouter); 
+
 
 app.listen(port,()=>{
     console.log(`listening on ${port}`)

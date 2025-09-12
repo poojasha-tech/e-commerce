@@ -48,7 +48,8 @@ router.post("/register",async(req,res)=>{
 
 
 router.post("/login",async(req , res)=>{
-    const data=req.body;
+    try {
+        const data=req.body;
     const dataInDb=await prisma.user.findFirst({where:{username:data.username,userType:data.userType}})
     if(dataInDb){
         if(dataInDb.password==hashPassword(data.password)){
@@ -64,6 +65,11 @@ router.post("/login",async(req , res)=>{
 
     else{
         return res.status(404).json({message:"not registered"})
+    }
+        
+    } catch (error) {
+        return res.status(500).send("something went wrong!!!")
+        
     }
 
 })
