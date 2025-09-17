@@ -13,7 +13,7 @@ router.get("/", (req, res) => {
 
 
 
-router.post("/register", async (req, res) => {
+router.post("/api/auth/register", async (req, res) => {
     try {
         const data = req.body;
         const dataInDb = await prisma.user.findFirst({ where: { username: data.username, userType: data.userType } })
@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
             // return res.status(201).send("welcome to e-commerce market place")
             newUser.password = null;
             const token = jwtToken(newUser);
-            console.log(token)
+            //console.log(token)
             return res.status(201).send({ token: token })
         }
 
@@ -47,7 +47,7 @@ router.post("/register", async (req, res) => {
 
 
 
-router.post("/login", async (req, res) => {
+router.post("/api/auth/login", async (req, res) => {
     try {
         const data = req.body;
         const dataInDb = await prisma.user.findFirst({ where: { username: data.username, userType: data.userType } })

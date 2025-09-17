@@ -14,7 +14,7 @@ app.use(express.json()); // middleware
 const authRouter=require("./controllers/auth");
 app.use(authRouter);
 
-app.use(verifyUserToken);
+//app.use(verifyUserToken);
 
 const taskRouter=require("./controllers/task");
 app.use(taskRouter); 

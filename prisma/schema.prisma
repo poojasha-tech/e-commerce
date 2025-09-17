@@ -11,23 +11,49 @@ datasource db {
 }
 
 
+// enum UserType {
+//   BUYER
+//   SELLER
+// }
+
+
+// model User {
+//   id    Int     @id @default(autoincrement())
+//   username String @unique
+//   password String 
+//   userType  UserType
+// }
+
+
+
+// model items{
+//   id Int @id @default(autoincrement())
+//   name String 
+//   price Int
+// }
+
 enum UserType {
-  BUYER
-  SELLER
-}
+   BUYER
+   SELLER
+ }
 
 
 model User {
-  id    Int     @id @default(autoincrement())
-  username String @unique
-  password String 
-  userType  UserType
+  id       Int       @id @default(autoincrement())
+  username String
+  password String
+  userType UserType
 }
 
-
-
-model items{
-  id Int @id @default(autoincrement())
-  name String 
-  price Int
+model Catalog {
+  id       Int      @id @default(autoincrement())
+  username     String
 }
+
+model Product {
+  id         Int      @id @default(autoincrement())
+  name       String
+  price      Int
+  catalogId  Int
+}
+
