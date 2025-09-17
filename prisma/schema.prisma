@@ -40,14 +40,14 @@ enum UserType {
 
 model User {
   id       Int       @id @default(autoincrement())
-  username String
+  username String    @unique
   password String
   userType UserType
 }
 
 model Catalog {
   id       Int      @id @default(autoincrement())
-  username     String
+  username     String @unique
 }
 
 model Product {

@@ -20,21 +20,45 @@ router.post("/api/seller/create-catalog", async (req, res) => {
         }
         if (user && user.userType == "SELLER") {
             //return res.status(200).send("hello seller")
-            const catalogue = req.body;
+            const productToAdd = req.body;
 
-            const addCatalogue=await prisma.catalog.create({
-                data:{
-                    username:user.username
+            const catalog = await prisma.catalog.findUnique({
+                where: {
+                    username: user.username
                 }
             })
-            const addProduct = await prisma.product.create({
-                data: {
-                    name: catalogue.name,
-                    price: Number(catalogue.price),
-                    catalogId:addCatalogue.id
-                }
-            })
-            return res.status(201).send(addProduct+addCatalogue)
+
+
+            if (!catalog) {
+                const addNewCatalogue = await prisma.catalog.create({
+                    data: {
+                        username: user.username
+                    }
+                })
+                const addProduct=await prisma.product.create({
+                    data:{
+                        name:productToAdd.name,
+                        price:Number(productToAdd.price),
+                        catalogId:addNewCatalogue.id
+                    }
+                })
+                return res.status(201).send(addNewCatalogue + addProduct)
+            }
+
+            else {
+                const addProduct = await prisma.product.create({
+                    data: {
+                        name: productToAdd.name,
+                        price: Number(productToAdd.price),
+                        catalogId:catalog.id
+                    }
+                })
+                return res.status(201).send(addProduct)
+
+            }
+
+
+
         }
 
     } catch (error) {
