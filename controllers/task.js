@@ -19,12 +19,14 @@ router.post("/api/seller/create-catalog", async (req, res) => {
             return res.status(409).send("you are not seller !!!")
         }
         if (user && user.userType == "SELLER") {
+
             //return res.status(200).send("hello seller")
-            const productToAdd = req.body;
+            const productToAddList = req.body;
 
             const catalog = await prisma.catalog.findUnique({
                 where: {
-                    username: user.username
+                    username: user.username,
+                    catalogId:user.id
                 }
             })
 
@@ -32,28 +34,40 @@ router.post("/api/seller/create-catalog", async (req, res) => {
             if (!catalog) {
                 const addNewCatalogue = await prisma.catalog.create({
                     data: {
-                        username: user.username
+                        username: user.username,
+                        catalogId:user.id
                     }
                 })
-                const addProduct=await prisma.product.create({
-                    data:{
-                        name:productToAdd.name,
-                        price:Number(productToAdd.price),
-                        catalogId:addNewCatalogue.id
-                    }
-                })
-                return res.status(201).send(addNewCatalogue + addProduct)
+                for (let i = 0; i < productToAddList.length; i++) {
+                    const product = productToAddList[i]
+                    const addProduct = await prisma.product.createManyAndReturn({
+                        data: [{
+                            name: product.name,
+                            price: Number(product.price),
+                            productId: addNewCatalogue.catalogId
+
+                        }],
+
+                    })
+                }
+
+                return res.status(201).send("product added")
             }
 
             else {
-                const addProduct = await prisma.product.create({
-                    data: {
-                        name: productToAdd.name,
-                        price: Number(productToAdd.price),
-                        catalogId:catalog.id
-                    }
-                })
-                return res.status(201).send(addProduct)
+                for (let i = 0; i < productToAddList.length; i++) {
+                    const product = productToAddList[i]
+                    const addProduct = await prisma.product.createManyAndReturn({
+                        data: [{
+                            name: product.name,
+                            price: Number(product.price),
+                            productId: catalog.catalogId
+
+                        }],
+
+                    })
+                }
+                return res.status(201).send("product added")
 
             }
 
@@ -64,7 +78,6 @@ router.post("/api/seller/create-catalog", async (req, res) => {
     } catch (error) {
         console.error(error)
         return res.status(500).send("something went wrong")
-
     }
 })
 
@@ -86,6 +99,7 @@ router.get("/api/buyer/list-of-sellers", async (req, res) => {
                     userType: "SELLER"
                 },
                 select: {
+                    id:true,
                     username: true,
                 }
             })
@@ -97,6 +111,42 @@ router.get("/api/buyer/list-of-sellers", async (req, res) => {
         return res.status(500).send("something went wrong!!!")
 
     }
+})
+
+router.get("/api/buyer/seller-catalog/:seller_id" , async(req,res)=>{
+    try {
+        const token = req.headers.authorization.replace("Bearer ", "");
+        const tokenToObject = jwt.verify(token, secret);
+        const user = tokenToObject.data;
+        if(!user){
+            return res.status(409).send("please register")
+        }
+
+        if(user && user.userType=="SELLER"){
+            return res.status(409).send("please register as BUYER to get SELLER'S catalogue")
+        }
+
+        if(user && user.userType=="BUYER"){
+            const sellerIdString=req.params.seller_id;
+            console.log(sellerIdString)
+            const sellerIdNumber=Number(sellerIdString)
+            const getSellerCatalog=await prisma.catalog.findMany({
+                where:{
+                    catalogId:sellerIdNumber
+                },
+                select:{
+                    id:true,
+                    username:true
+                }
+            })
+            return res.status(200).send(getSellerCatalog)
+        }
+        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send("something went wrong!")
+    }
+
 })
 
 module.exports = router;
