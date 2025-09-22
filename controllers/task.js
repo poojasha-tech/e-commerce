@@ -128,7 +128,7 @@ router.get("/api/buyer/seller-catalog/:seller_id" , async(req,res)=>{
 
         if(user && user.userType=="BUYER"){
             const sellerIdString=req.params.seller_id;
-            console.log(sellerIdString)
+            //console.log(sellerIdString)
             const sellerIdNumber=Number(sellerIdString)
             const getSellerCatalog=await prisma.catalog.findMany({
                 where:{
@@ -145,6 +145,54 @@ router.get("/api/buyer/seller-catalog/:seller_id" , async(req,res)=>{
     } catch (error) {
         console.log(error)
         return res.status(500).send("something went wrong!")
+    }
+
+})
+
+
+router.post("/api/buyer/create-order/:seller_id" , async(req,res)=>{
+    try {
+        const token = req.headers.authorization.replace("Bearer ", "");
+        const tokenToObject = jwt.verify(token, secret);
+        const user = tokenToObject.data;
+        if(!user){
+            return res.status(409).send("please register")
+        }
+
+        if(user && user.userType=="SELLER"){
+            return res.status(409).send("please register as BUYER to get SELLER'S catalogue")
+        }
+        if(user && user.userType=="BUYER"){
+            const sellerIdString=req.params.seller_id;
+            const sellerIdNumber=Number(sellerIdString)
+            const getSellerCatalog=await prisma.catalog.findMany({
+                where:{
+                    catalogId:sellerIdNumber
+                },
+                select:{
+                    id:true,
+                    username:true
+                }
+            })
+            const getOrder=await prisma.product.findMany({
+                where:{
+                    productId:getSellerCatalog.catalogId
+                },
+                select:{
+                    name:true,
+                    price:true
+                }
+            })
+
+           // const createOrder=await prisma
+            return res.status(200).send(getOrder)
+
+        }
+        
+    } catch (error) {
+        console.error(error)
+        return res.status(500).send("somethung went wrong!!!")
+        
     }
 
 })
