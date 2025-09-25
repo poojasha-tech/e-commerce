@@ -246,7 +246,7 @@ router.post("/api/buyer/create-order/:seller_id", async (req, res) => {
 })
 
 
-router.get(" /api/seller/orders", async (req, res) => {
+router.get("/api/seller/orders", async (req, res) => {
     try {
         const token = req.headers.authorization.replace("Bearer ", "");
         const tokenToObject = jwt.verify(token, secret);
@@ -259,10 +259,23 @@ router.get(" /api/seller/orders", async (req, res) => {
             return res.status(409).send("please register as SELLER to get orders")
         }
         if (user && user.userType == "SELLER") {
+            const ordersToSeller=await prisma.order.findMany({
+                where:{
+                    sellerCatalogId:user.id
+                },
+                select:{
+                    productId:true,
+                    productName:true,
+                    productPrice:true
+                }
+            })
+            return res.status(201).send(ordersToSeller)
 
         }
 
     } catch (error) {
+        console.error(error)
+        return res.status(500).send("something wnet wrong!!!")
 
     }
 
