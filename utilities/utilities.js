@@ -1,6 +1,6 @@
 const crypto = require('crypto');
-const jwt = require('jsonwebtoken');   
-const secret="bigsecret"; // Define your secret key for JWT signing
+const jwt = require('jsonwebtoken');
+const secret = "bigsecret"; // Define your secret key for JWT signing
 
 
 
@@ -18,4 +18,17 @@ function jwtToken(user) {
   return token;
 }
 
-module.exports = { hashPassword, jwtToken };
+function verifyJwt(token) {
+  try {
+    // const token = req.headers.authorization.replace("Bearer ", "");  ,,,, this is how token comes
+    // const tokenToObject = jwt.verify(token, secret);
+    // const user = tokenToObject.data;
+    var decoded = jwt.verify(token, secret);
+    return decoded.data;
+
+  } catch (error) {
+    return null
+  }
+}
+
+module.exports = { hashPassword, jwtToken, verifyJwt };

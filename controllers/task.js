@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../prisma/db");
-const { hashPassword, jwtToken } = require("../utilities/utilities");
+const {verifyJwt}=require("../utilities/utilities")
+
 const jwt = require("jsonwebtoken");
 const { UserType } = require("@prisma/client");
 const secret = "bigsecret";
@@ -9,9 +10,10 @@ const secret = "bigsecret";
 
 router.post("/api/seller/create-catalog", async (req, res) => {
     try {
-        const token = req.headers.authorization.replace("Bearer ", "");
-        const tokenToObject = jwt.verify(token, secret);
-        const user = tokenToObject.data;
+        // const token = req.headers.authorization.replace("Bearer ", "");
+        // const tokenToObject = jwt.verify(token, secret);
+        // const user = tokenToObject.data;
+        const user=req.user;
         if (!user) {
             return res.status(409).send("please register")
         }
@@ -84,9 +86,10 @@ router.post("/api/seller/create-catalog", async (req, res) => {
 
 router.get("/api/buyer/list-of-sellers", async (req, res) => {
     try {
-        const token = req.headers.authorization.replace("Bearer ", "");
-        const tokenToObject = jwt.verify(token, secret);
-        const user = tokenToObject.data;
+        // const token = req.headers.authorization.replace("Bearer ", "");
+        // const tokenToObject = jwt.verify(token, secret);
+        // const user = tokenToObject.data;
+        const user=req.user;
         if (!user) {
             return res.send(409).send("please register")
         }
@@ -115,9 +118,10 @@ router.get("/api/buyer/list-of-sellers", async (req, res) => {
 
 router.get("/api/buyer/seller-catalog/:seller_id", async (req, res) => {
     try {
-        const token = req.headers.authorization.replace("Bearer ", "");
-        const tokenToObject = jwt.verify(token, secret);
-        const user = tokenToObject.data;
+        // const token = req.headers.authorization.replace("Bearer ", "");
+        // const tokenToObject = jwt.verify(token, secret);
+        // const user = tokenToObject.data;
+        const user=req.user;
         if (!user) {
             return res.status(409).send("please register")
         }
@@ -165,9 +169,10 @@ router.get("/api/buyer/seller-catalog/:seller_id", async (req, res) => {
 
 router.post("/api/buyer/create-order/:seller_id", async (req, res) => {
     try {
-        const token = req.headers.authorization.replace("Bearer ", "");
-        const tokenToObject = jwt.verify(token, secret);
-        const user = tokenToObject.data;
+        // const token = req.headers.authorization.replace("Bearer ", "");
+        // const tokenToObject = jwt.verify(token, secret);
+        // const user = tokenToObject.data;
+        const user=req.user;
         const productIdList = req.body.ids;
         if (!user) {
             return res.status(409).send("please register")
@@ -248,9 +253,10 @@ router.post("/api/buyer/create-order/:seller_id", async (req, res) => {
 
 router.get("/api/seller/orders", async (req, res) => {
     try {
-        const token = req.headers.authorization.replace("Bearer ", "");
-        const tokenToObject = jwt.verify(token, secret);
-        const user = tokenToObject.data;
+        // const token = req.headers.authorization.replace("Bearer ", "");
+        // const tokenToObject = jwt.verify(token, secret);
+        // const user = tokenToObject.data;
+        const user=req.user;
         if (!user) {
             return res.status(409).send("please register")
         }

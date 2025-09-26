@@ -1,32 +1,23 @@
-// const jwt = require("jsonwebtoken");
-// const secret = "mysecret";
+const { verifyJwt } = require("../utilities/utilities");
 
-// function verifyUserToken(req,res,next){
-//     try {
 
-//         const token = req.headers.authorization?.replace("Bearer ", "");
-//         if (!token) {
-//             return res.status(401).send("Unauthorized user!");
-//         }
+function verifyUserToken(req, res, next) {
+    try{
 
-//         const tokenToObject = jwt.verify(token, secret);
-//         const user = tokenToObject.data;
-//         if (!user) {
-//             return res.status(401).send("Unauthorized user!");
-//         }
-//         else{
-//             // Attach user to request object for further use in the route handlers
-//             req.user = user;
-//             next();  // Call next middleware or route handler
-//         }
-        
-//     } catch (error) {
-//         console.error("Error in verifyUserToken middleware:", error);
-//         return res.status(500).send("Internal Server Error");
-        
-//     }
-   
+        const token = req.headers?.authorization?.replace("Bearer ", "");
+        const user = verifyJwt(token);
+        if (!user)
+            return res.status(401).send("unauthorised!")
+    
+        else {
+            req.user = user
+            next()
+        }
+    }
+    catch(e){
+        console.error("Error while authenticating the user from token", e)
+        return res.status(401).send("unauthorised")
+    }
+}
 
-// }
-
-// module.exports=verifyUserToken;
+module.exports = verifyUserToken
